@@ -14,55 +14,55 @@ object Day03 : AdventSolution {
     override val day = 3
 
     override fun solvePartOne(input: String): String {
-        val (x, y) = toCoordinates(input.toInt())
+        val (x, y) = toSpiralCoordinates(input.toInt())
         return (abs(x) + abs(y) - 1).toString()
     }
 
     override fun solvePartTwo(input: String): String {
+        val spiralCoordinatesSequence = generateSequence(1) { it + 1 }
+                .map { toSpiralCoordinates(it) }
 
-        val spiral = Array(30) { IntArray(30) }
-        val offset = 15
-        spiral[offset][offset] = 1
+        val spiral = mutableMapOf((0 to 0) to 1)
 
-        return (1..60)
-                .map { i ->
+        val spiralSummatorySequence = spiralCoordinatesSequence.map { coordinate ->
+            coordinate.neighbors()
+                    .sumBy { neighbor -> spiral[neighbor] ?: 0 }
+                    .also { spiral[coordinate] = it }
+        }
 
-                    val (x, y) = toCoordinates(i).let { (x, y) -> x + offset to y + offset }
-
-                    spiral[x][y] = (x to y)
-                            .neighbors()
-                            .sumBy { (xx, yy) -> spiral[xx][yy] }
-
-                    spiral[x][y]
-                }
+        return spiralSummatorySequence
                 .find { it > input.toInt() }
                 .toString()
     }
 
-    private fun Pair<Int, Int>.neighbors(): List<Pair<Int, Int>> {
-        val xs = listOf(first - 1, first, first + 1)
-        val ys = listOf(second - 1, second, second + 1)
-        return xs.flatMap { x -> ys.map { y -> x to y } }
-    }
+    private fun Pair<Int, Int>.neighbors() =
+            (-1..1).flatMap { x ->
+                (-1..1).map { y ->
+                    Pair(first + x, second + y)
+                }
+            }
 
-    //sorry
-    private fun toCoordinates(n: Int): Pair<Int, Int> {
-        if (n <= 0) return 0 to 0
+    private fun toSpiralCoordinates(index: Int): Pair<Int, Int> {
+        if (index <= 0) return Pair(0, 0)
 
-        val v = (sqrt(n - .75) - .5).toInt()
-        val spiralBaseIndex = v * (v + 1)
-        val sign = v % 2 * 2 - 1 // sign == v even
-        val offset = sign * ((v + 1) / 2)
-        val cornerIndex = spiralBaseIndex + v + 1
+        //The width of the edge at the current edge of the spiral
+        val width = Math.round(sqrt(index.toDouble())).toInt()
 
-        return if (n <= cornerIndex) {
-            val x = offset - sign * (n - spiralBaseIndex)
-            x to offset
-        } else {
-            val x = offset - sign * (v + 1)
-            val y = offset - sign * (n - cornerIndex)
-            x to y
-        }
+        //the index of the end of the preceding completed half-turn
+        val spiralBaseIndex = width * (width - 1)
 
+        // 1 or -1, depending on if we've done a complete turn or a half-turn
+        val sign = width % 2 * 2 - 1
+
+        //distance from origin: the position of spiralBaseIndex is [offset,offset]
+        val offset = sign * (width / 2)
+
+        //corner in the middle of the current half-turn
+        val cornerIndex = spiralBaseIndex + width
+
+        val x = offset - sign * (index - spiralBaseIndex).coerceAtMost(width)
+        val y = offset - sign * (index - cornerIndex).coerceAtLeast(0)
+
+        return Pair(x, y)
     }
 }
