@@ -4,14 +4,7 @@ import nl.ruudwiegers.adventofcode.AdventSolution
 import kotlin.math.abs
 import kotlin.math.sqrt
 
-object Day03 : AdventSolution {
-    @JvmStatic
-    fun main(args: Array<String>) {
-        Day03.solve()
-    }
-
-    override val year = 2017
-    override val day = 3
+object Day03 : AdventSolution(2017, 3) {
 
     override fun solvePartOne(input: String): String {
         val (x, y) = toSpiralCoordinates(input.toInt())

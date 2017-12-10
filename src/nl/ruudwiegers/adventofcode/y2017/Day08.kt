@@ -2,14 +2,7 @@ package nl.ruudwiegers.adventofcode.y2017
 
 import nl.ruudwiegers.adventofcode.AdventSolution
 
-object Day08 : AdventSolution {
-    @JvmStatic
-    fun main(args: Array<String>) {
-        Day08.solve()
-    }
-
-    override val year = 2017
-    override val day = 8
+object Day08 : AdventSolution(2017, 8) {
 
     override fun solvePartOne(input: String): String {
         val registers = mutableMapOf<String, Int>()
@@ -42,7 +35,6 @@ object Day08 : AdventSolution {
                 }
     }
 
-
     private data class Instruction(val register: String,
                                    private val amount: Int,
                                    private val comparandRegister: String,
@@ -63,6 +55,5 @@ object Day08 : AdventSolution {
             "!=" -> v != comparand
             else -> throw IllegalStateException(comparator)
         }
-
     }
 }

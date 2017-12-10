@@ -2,14 +2,7 @@ package nl.ruudwiegers.adventofcode.y2017
 
 import nl.ruudwiegers.adventofcode.AdventSolution
 
-object Day07 : AdventSolution {
-    @JvmStatic
-    fun main(args: Array<String>) {
-        Day07.solve()
-    }
-
-    override val year = 2017
-    override val day = 7
+object Day07 : AdventSolution(2017, 7) {
 
     override fun solvePartOne(input: String): String {
         return findRootProgram(parse(input)).name

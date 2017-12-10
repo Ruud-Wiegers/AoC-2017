@@ -2,14 +2,7 @@ package nl.ruudwiegers.adventofcode.y2017
 
 import nl.ruudwiegers.adventofcode.AdventSolution
 
-object Day09 : AdventSolution {
-    @JvmStatic
-    fun main(args: Array<String>) {
-        Day09.solve()
-    }
-
-    override val year = 2017
-    override val day = 9
+object Day09 : AdventSolution(2017, 9) {
 
     override fun solvePartOne(input: String): String {
         val cleanedInput = input
@@ -31,7 +24,5 @@ object Day09 : AdventSolution {
         val cleaned = unignored.replace("<.*?>".toRegex(), "<>")
         return (unignored.length - cleaned.length).toString()
     }
-
-
 }
 

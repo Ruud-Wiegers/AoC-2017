@@ -1,8 +1,6 @@
 package nl.ruudwiegers.adventofcode
 
-interface AdventSolution {
-    val year: Int
-    val day: Int
+abstract class AdventSolution(val year: Int, val day: Int) {
 
     fun solve() {
         val input = AdventOfCodeApi.retrieveInput(day, year)
@@ -12,7 +10,7 @@ interface AdventSolution {
         println("  2. " + solvePartTwo(input))
     }
 
-    fun solvePartOne(input: String): String
-    fun solvePartTwo(input: String): String
+    abstract fun solvePartOne(input: String): String
+    abstract fun solvePartTwo(input: String): String
 }
 

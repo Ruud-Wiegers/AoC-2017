@@ -2,14 +2,7 @@ package nl.ruudwiegers.adventofcode.y2017
 
 import nl.ruudwiegers.adventofcode.AdventSolution
 
-object Day06 : AdventSolution {
-    @JvmStatic
-    fun main(args: Array<String>) {
-        Day06.solve()
-    }
-
-    override val year = 2017
-    override val day = 6
+object Day06 : AdventSolution(2017, 6) {
 
     override fun solvePartOne(input: String): String {
         val state = parse(input)
@@ -51,6 +44,4 @@ object Day06 : AdventSolution {
     private fun parse(input: String) = input
             .split("\t")
             .map { it.toInt() }
-
-
 }

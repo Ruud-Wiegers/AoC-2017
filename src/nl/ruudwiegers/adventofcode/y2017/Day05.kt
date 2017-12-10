@@ -2,14 +2,7 @@ package nl.ruudwiegers.adventofcode.y2017
 
 import nl.ruudwiegers.adventofcode.AdventSolution
 
-object Day05 : AdventSolution {
-    @JvmStatic
-    fun main(args: Array<String>) {
-        Day05.solve()
-    }
-
-    override val year = 2017
-    override val day = 5
+object Day05 : AdventSolution(2017, 5) {
 
     override fun solvePartOne(input: String): String {
         val jumpmap = parse(input)
@@ -42,6 +35,4 @@ object Day05 : AdventSolution {
         }
         return count
     }
-
-
 }

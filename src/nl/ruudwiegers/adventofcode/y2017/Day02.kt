@@ -2,14 +2,7 @@ package nl.ruudwiegers.adventofcode.y2017
 
 import nl.ruudwiegers.adventofcode.AdventSolution
 
-object Day02 : AdventSolution {
-    @JvmStatic
-    fun main(args: Array<String>) {
-        Day02.solve()
-    }
-
-    override val year = 2017
-    override val day = 2
+object Day02 : AdventSolution(2017, 2) {
 
     override fun solvePartOne(input: String) = solveForChecksum(input) { it.max()!! - it.min()!! }
 
@@ -24,6 +17,4 @@ object Day02 : AdventSolution {
             .map { it.split("\t").map(String::toInt) }
             .sumBy(checksum)
             .toString()
-
-
 }
