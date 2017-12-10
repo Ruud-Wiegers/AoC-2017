@@ -7,10 +7,9 @@ interface AdventSolution {
     fun solve() {
         val input = AdventOfCodeApi.retrieveInput(day, year)
         val d = day.toString().padStart(2)
-        print("$d December $year : ")
-        print(solvePartOne(input).padStart(10))
-        print(solvePartTwo(input).padStart(12))
-        println()
+        println("$d December $year : ")
+        println("  1. " + solvePartOne(input))
+        println("  2. " + solvePartTwo(input))
     }
 
     fun solvePartOne(input: String): String
