@@ -15,7 +15,7 @@ object Day03 : AdventSolution(2017, 3) {
         val spiralCoordinatesSequence = generateSequence(1) { it + 1 }
                 .map { toSpiralCoordinates(it) }
 
-        val spiral = mutableMapOf((0 to 0) to 1)
+        val spiral = mutableMapOf(Pair(0, 0) to 1)
 
         val spiralSummatorySequence = spiralCoordinatesSequence.map { coordinate ->
             coordinate.neighbors()

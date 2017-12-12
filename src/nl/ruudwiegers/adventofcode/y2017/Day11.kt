@@ -3,10 +3,6 @@ package nl.ruudwiegers.adventofcode.y2017
 import nl.ruudwiegers.adventofcode.AdventSolution
 import kotlin.math.abs
 
-fun main(args: Array<String>) {
-    Day11.solve()
-}
-
 object Day11 : AdventSolution(2017, 11) {
     override fun solvePartOne(input: String) = input.split(",")
             .mapNotNull { coordinatesForDirection[it] }

@@ -3,7 +3,7 @@ package nl.ruudwiegers.adventofcode.y2017
 import nl.ruudwiegers.adventofcode.AdventSolution
 
 object Day12 : AdventSolution(2017, 12) {
-
+    
     override fun solvePartOne(input: String): String {
         val connections = parseInput(input)
         val group = findGroup(connections, 0)
