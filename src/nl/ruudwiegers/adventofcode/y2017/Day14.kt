@@ -18,34 +18,30 @@ object Day14 : AdventSolution(2017, 14) {
                 .map { knotHash(it) }
                 .map { hash -> hash.flatMap { toBits(it) }.toBooleanArray() }
 
-        return rows.indices.asSequence()
-                .flatMap { y ->
-                    rows[0].indices.asSequence()
-                            .map { x -> Pair(x, y) }
+        var count = 0
+        for (x in rows.indices) {
+            for (y in rows[0].indices) {
+                if (rows[y][x]) {
+                    clearGroup(rows, x, y)
+                    count++
                 }
-                .filter { (x, y) -> rows[y][x] }
-                .onEach { clearGroup(rows, it) }
-                .count()
-                .toString()
+            }
+        }
+        return count.toString()
     }
 
-    private fun clearGroup(rows: List<BooleanArray>, c: Pair<Int, Int>) {
-        rows[c.second][c.first] = false
-        c.neighbors()
-                .filter { (x, y) ->
-                    x in rows[0].indices
-                            && y in rows.indices
-                            && rows[y][x]
-                }
-                .forEach { n -> clearGroup(rows, n) }
+    private fun clearGroup(rows: List<BooleanArray>, x: Int, y: Int) {
+        if (rows.getOrNull(y)?.getOrNull(x) != true) {
+            return
+        }
+
+        rows[y][x] = false
+
+        clearGroup(rows, x + 1, y)
+        clearGroup(rows, x - 1, y)
+        clearGroup(rows, x, y + 1)
+        clearGroup(rows, x, y - 1)
     }
 }
 
 private fun toBits(n: Int) = List(8) { n and (1 shl 7 - it) != 0 }
-
-private fun Pair<Int, Int>.neighbors() = listOf(
-        Pair(first + 1, second),
-        Pair(first - 1, second),
-        Pair(first, second + 1),
-        Pair(first, second - 1)
-)
