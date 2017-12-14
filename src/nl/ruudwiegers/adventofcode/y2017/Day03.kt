@@ -2,6 +2,7 @@ package nl.ruudwiegers.adventofcode.y2017
 
 import nl.ruudwiegers.adventofcode.AdventSolution
 import kotlin.math.abs
+import kotlin.math.sign
 import kotlin.math.sqrt
 
 object Day03 : AdventSolution(2017, 3) {
@@ -45,7 +46,7 @@ object Day03 : AdventSolution(2017, 3) {
         val spiralBaseIndex = width * (width - 1)
 
         // 1 or -1, depending on if we've done a complete turn or a half-turn
-        val sign = width % 2 * 2 - 1
+        val sign = width.sign
 
         //distance from origin: the position of spiralBaseIndex is [offset,offset]
         val offset = sign * (width / 2)
