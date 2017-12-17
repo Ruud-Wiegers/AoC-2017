@@ -5,6 +5,10 @@ import kotlin.math.abs
 import kotlin.math.sign
 import kotlin.math.sqrt
 
+fun main(args: Array<String>) {
+    Day03.solve()
+}
+
 object Day03 : AdventSolution(2017, 3) {
 
     override fun solvePartOne(input: String): String {
@@ -40,13 +44,15 @@ object Day03 : AdventSolution(2017, 3) {
         if (index <= 0) return Pair(0, 0)
 
         //The width of the edge at the current edge of the spiral
+        //each half-turn the width increases by one
         val width = Math.round(sqrt(index.toDouble())).toInt()
 
         //the index of the end of the preceding completed half-turn
+        //i.e. the size of the completed inner 'block'
         val spiralBaseIndex = width * (width - 1)
 
         // 1 or -1, depending on if we've done a complete turn or a half-turn
-        val sign = width.sign
+        val sign = if (width % 2 == 0) 1 else -1
 
         //distance from origin: the position of spiralBaseIndex is [offset,offset]
         val offset = sign * (width / 2)
