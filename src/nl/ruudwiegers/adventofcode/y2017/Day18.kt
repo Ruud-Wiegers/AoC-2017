@@ -9,90 +9,89 @@ fun main(args: Array<String>) {
 object Day18 : AdventSolution(2017, 18) {
 
     override fun solvePartOne(input: String): String {
-        val instructions: List<List<String>> = lex(input)
+        val instructions = parseInstructions(input)
+        val context = ExecutionContext()
+        var ip = 0
+        var mostRecentSound = "nothing"
 
-        val reg = mutableMapOf<String, Long>()
-        var pc = 0
-        while (pc in instructions.indices) {
-            pc += execute(instructions[pc], reg)
-        }
-        return reg["snd"].toString()
-    }
-
-    private fun execute(op: List<String>, reg: MutableMap<String, Long>): Int {
-        when (op[0]) {
-            "snd" -> reg["snd"] = eval(op[1], reg)
-            "set" -> reg[op[1]] = eval(op[2], reg)
-            "add" -> reg[op[1]] = eval(op[1], reg) + eval(op[2], reg)
-            "mul" -> reg[op[1]] = eval(op[1], reg) * eval(op[2], reg)
-            "mod" -> reg[op[1]] = eval(op[1], reg) % eval(op[2], reg)
-            "rcv" -> if (eval(op[1], reg) != 0L) {
-                return 100000
+        while (ip in instructions.indices) {
+            val (operator, x, y) = instructions[ip]
+            when (operator) {
+                "set" -> context[x] = context[y]
+                "add" -> context[x] += context[y]
+                "mul" -> context[x] *= context[y]
+                "mod" -> context[x] %= context[y]
+                "snd" -> mostRecentSound = context[x].toString()
+                "rcv" -> if (context[x] != 0L) return mostRecentSound
+                "jgz" -> if (context[x] > 0L) ip += context[y].toInt() - 1
             }
-            "jgz" -> if (eval(op[1], reg) > 0) return eval(op[2], reg).toInt()
+            ip++
         }
-        return 1
+        return mostRecentSound
     }
-
-    private fun eval(value: String, registers: Map<String, Long>) = value.toLongOrNull() ?: registers[value] ?: 0
-    private fun lex(input: String) = input.split("\n").map { row -> row.split(" ") }
-
 
     override fun solvePartTwo(input: String): String {
-        val instructions = input.split("\n").map { row -> row.split(" ") }
+        val instructions = parseInstructions(input)
         val q1 = mutableListOf<Long>()
         val q2 = mutableListOf<Long>()
 
-        val ec1 = ExecutionContext(0, instructions, q1, q2)
-        val ec2 = ExecutionContext(1, instructions, q2, q1)
+        val ec0 = ProgramTwo(0, q1, q2)
+        val ec1 = ProgramTwo(1, q2, q1)
 
-        while (ec1.canExecute() || ec2.canExecute()) {
-            if (ec1.canExecute()) ec1.execute() else ec2.execute()
+        while (ec0.canExecute(instructions) || ec1.canExecute(instructions)) {
+            ec0.run(instructions)
+            ec1.run(instructions)
         }
-        return ec2.sendCount.toString()
+
+        return ec1.sendCount.toString()
     }
 
+    private fun parseInstructions(input: String) = input.split("\n")
+            .map { row -> row.split(" ") + "" }
 }
 
+private class ProgramTwo(id: Long,
+                         private val sendQueue: MutableList<Long>,
+                         private val receiveQueue: MutableList<Long>) {
 
-class ExecutionContext(id: Long,
-                       private val instructions: List<List<String>>,
-                       private val sendQueue: MutableList<Long>,
-                       private val receiveQueue: MutableList<Long>) {
+    private val context = ExecutionContext().apply { this["p"] = id  }
 
-    private val registers: MutableMap<String, Long> = mutableMapOf("p" to id)
-
-    private var pc = 0
+    private var ip = 0
 
     var sendCount = 0
+        private set
 
-    fun canExecute() = pc in instructions.indices && (instructions[pc][0] != "rcv" || receiveQueue.isNotEmpty())
+    fun canExecute(instructions: List<List<String>>) = ip in instructions.indices
+            && (instructions[ip][0] != "rcv" || receiveQueue.isNotEmpty())
 
-    fun execute() {
-        val operator: String = instructions[pc][0]
-        val x: String = instructions[pc][1]
-        val y: String? = instructions[pc].getOrNull(2)
-
-        execute(operator, x, y)
-        pc++
-    }
-
-    private fun execute(operator: String, x: String, y: String?) {
-        when (operator) {
-            "snd" -> {
-                sendQueue += eval(x)
-                sendCount++
-            }
-            "set" -> registers[x] = eval(y)
-            "add" -> registers[x] = eval(x) + eval(y)
-            "mul" -> registers[x] = eval(x) * eval(y)
-            "mod" -> registers[x] = eval(x) % eval(y)
-            "rcv" -> registers[x] = receiveQueue.removeAt(0)
-            "jgz" -> if (eval(x) > 0) {
-                pc += eval(y).toInt() - 1
-            }
+    fun run(instructions: List<List<String>>) {
+        while (canExecute(instructions)) {
+            executeNext(instructions[ip])
         }
     }
 
-    private fun eval(value: String?) = value?.toLongOrNull() ?: registers[value] ?: 0
+    private fun executeNext(instruction: List<String>) {
+        val (operator, x, y) = instruction
+        when (operator) {
+            "snd" -> {
+                sendQueue += context[x]
+                sendCount++
+            }
+            "rcv" -> context[x] = receiveQueue.removeAt(0)
+            "set" -> context[x] = context[y]
+            "add" -> context[x] += context[y]
+            "mul" -> context[x] *= context[y]
+            "mod" -> context[x] %= context[y]
+            "jgz" -> if (context[x] > 0L) ip += context[y].toInt() - 1
+        }
+        ip++
+    }
+}
+
+private class ExecutionContext {
+    private val registers: MutableMap<String, Long> = mutableMapOf()
+
+    operator fun get(value: String) = value.toLongOrNull() ?: registers[value] ?: 0
+
+    operator fun set(name: String, value: Long) = registers.put(name, value)
 }
