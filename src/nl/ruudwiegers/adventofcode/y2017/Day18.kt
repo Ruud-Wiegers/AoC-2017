@@ -2,10 +2,6 @@ package nl.ruudwiegers.adventofcode.y2017
 
 import nl.ruudwiegers.adventofcode.AdventSolution
 
-fun main(args: Array<String>) {
-    Day18.solve()
-}
-
 object Day18 : AdventSolution(2017, 18) {
 
     override fun solvePartOne(input: String): String {
