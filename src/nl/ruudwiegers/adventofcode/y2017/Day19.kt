@@ -1,7 +1,6 @@
 package nl.ruudwiegers.adventofcode.y2017
 
 import nl.ruudwiegers.adventofcode.AdventSolution
-import nl.ruudwiegers.adventofcode.y2017.Direction.*
 
 object Day19 : AdventSolution(2017, 19) {
 
@@ -18,58 +17,40 @@ object Day19 : AdventSolution(2017, 19) {
         pipeRunner.run()
         return pipeRunner.count.toString()
     }
-
 }
-
 
 private class PipeRunner(private val pipes: List<String>) {
 
-    private var y = 0
-    private var x = pipes[y].indexOf("|")
-
-    var direction = DOWN
-
+    private var position = Point(pipes[0].indexOf("|"), 0)
+    var direction = Point(0, 1)
     var word = ""
-        private set
-
     var count = 0
-        private set
 
     fun run() {
-        while (y in pipes.indices && x in pipes[y].indices) {
-            action()
-            step()
-        }
+        do {
+            val ch = charAt(position)
+            when (ch) {
+                '+' -> direction = findNewDirection()
+                in 'A'..'Z' -> word += ch
+                ' ' -> count--
+            }
+            position += direction
+            count++
+        } while (ch != ' ')
     }
 
-    private fun step() {
-        when (direction) {
-            UP ->    y--
-            RIGHT -> x++
-            DOWN ->  y++
-            LEFT ->  x--
-        }
-        count++
+    private fun findNewDirection(): Point {
+        val options = if (direction.x == 0)
+            listOf(Point(-1, 0), Point(1, 0))
+        else
+            listOf(Point(0, -1), Point(0, 1))
+
+        return options.first { charAt(position + it) in "-|" }
     }
 
-    private fun action() {
-        when (pipes[y][x]) {
-            '+' -> turn()
-            in 'A'..'Z' -> word += pipes[y][x]
-            ' ' -> {y = -10; count--} //end
-        }
-
-    }
-
-    private fun turn() {
-        direction = when {
-            direction != DOWN  && y > 0                   && pipes[y - 1][x] == '|' -> UP
-            direction != UP    && y < pipes.size - 1      && pipes[y + 1][x] == '|' -> DOWN
-            direction != RIGHT && x > 0                   && pipes[y][x - 1] == '-' -> LEFT
-            direction != LEFT  && x < pipes[y].length - 1 && pipes[y][x + 1] == '-' -> RIGHT
-            else -> direction
-        }
-    }
+    private fun charAt(p: Point) = pipes.getOrNull(p.y)?.getOrNull(p.x) ?: ' '
 }
 
-private enum class Direction { UP, RIGHT, DOWN, LEFT }
+private data class Point(val x: Int, val y: Int) {
+    operator fun plus(o: Point) = Point(x + o.x, y + o.y)
+}
