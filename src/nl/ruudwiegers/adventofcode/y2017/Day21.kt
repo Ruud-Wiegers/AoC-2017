@@ -2,7 +2,7 @@ package nl.ruudwiegers.adventofcode.y2017
 
 import nl.ruudwiegers.adventofcode.AdventSolution
 
-private val startingConfiguration = ".#./..#/###".split('/')
+private val startingConfiguration: Square = ".#./..#/###".split('/')
 
 object Day21 : AdventSolution(2017, 21) {
 
@@ -12,73 +12,46 @@ object Day21 : AdventSolution(2017, 21) {
 
     private fun puzzle(input: String, i: Int): Int {
         val rules = parseRewriteRules(input)
-        val fullRules = expandSymmetries(rules)
 
         var grid = startingConfiguration
-        repeat(i) { grid = step(grid, fullRules) }
-
-        return grid.sumBy { line ->
-            line.count { char ->
-                char == '#'
-            }
+        repeat(i) {
+            val squareSize = if (grid[0].length % 2 == 0) 2 else 3
+            grid = grid.step(squareSize, rules)
         }
+
+        return grid.countLights()
     }
 }
 
+private fun parseRewriteRules(input: String): Map<Square, Square> =
+        input.split("\n")
+                .map { it.split(" => ").map { it.split("/") } }
+                .flatMap { (old, new) -> old.symmetries().map { symmetryOfOld -> symmetryOfOld to new } }
+                .toMap()
 
-private fun parseRewriteRules(input: String): Map<Square, Square> = input.split("\n")
-        .map { it.split(" => ") }
-        .associate { (k, v) ->
-            k.split("/") to v.split("/")
-        }
-
-private fun expandSymmetries(input: Map<Square, Square>): Map<Square, Square> = input
-        .flatMap { entry -> symmetries(entry.key).map { it to entry.value } }
-        .toMap()
-
-private fun symmetries(pattern: Square): List<Square> {
-    val rotations = generateSequence(pattern, ::rotate).take(4).asIterable()
+private fun Square.symmetries(): List<Square> {
+    val rotations = generateSequence(this) { it.rotate() }.take(4).asIterable()
     return rotations + rotations.map { it.reversed() }
 }
 
-private fun rotate(list: Square): Square {
-    return list.indices.map { i ->
-        list[0].indices.reversed().map { j ->
-            list[j][i]
-        }.joinToString("")
-    }
+private fun Square.rotate(): Square = indices.map { i ->
+    this[0].indices.reversed().map { j ->
+        this[j][i]
+    }.joinToString("")
 }
 
-
-private fun step(grid: Square, fullRules: Map<Square, Square>): Square {
-    val squareSize = if (grid[0].length % 2 == 0) 2 else 3
-    val squares = splitToSquares(grid, squareSize)
-    val enhancedSquares = replaceSquares(squares, fullRules)
-    return combineSquaresToGrid(enhancedSquares)
-}
-
-private fun splitToSquares(grid: Square, size: Int): List<List<Square>> =
-        grid.chunked(size) { chunkRow ->
-            chunkRow.map { line -> line.chunked(size) }
+private fun Square.step(squareSize: Int, fullRules: Map<Square, Square>): Square =
+        chunked(squareSize).flatMap { chunkRow ->
+            chunkRow.map { line -> line.chunked(squareSize) }
                     .transpose()
+                    .map { square -> fullRules[square]!! }
+                    .transpose()
+                    .map { line -> line.joinToString("") }
         }
 
-private fun replaceSquares(chunkedGrid: List<List<Square>>, rules: Map<Square, Square>) =
-        chunkedGrid.map { row ->
-            row.map { square ->
-                rules[square]!!
-            }
-        }
-
-private fun combineSquaresToGrid(chunkedGrid: List<List<Square>>): Square =
-        chunkedGrid.flatMap { chunkRow ->
-            chunkRow.transpose().map { it.joinToString("") }
-        }
+private fun Square.countLights() = sumBy { line -> line.count { char -> char == '#' } }
 
 private inline fun <reified T> List<List<T>>.transpose() =
-        this[0].indices.map { col ->
-            map { it[col] }
-        }
+        this[0].indices.map { col -> map { it[col] } }
 
-
-typealias Square = List<String>
+private typealias Square = List<String>
