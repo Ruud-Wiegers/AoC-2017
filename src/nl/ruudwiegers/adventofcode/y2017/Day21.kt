@@ -1,129 +1,84 @@
 package nl.ruudwiegers.adventofcode.y2017
 
 import nl.ruudwiegers.adventofcode.AdventSolution
-import kotlin.math.sqrt
 
-fun main(args: Array<String>) {
-    Day21.solve()
-}
+private val startingConfiguration = ".#./..#/###".split('/')
 
 object Day21 : AdventSolution(2017, 21) {
 
-    override fun solvePartOne(input: String): String {
-        return puzzle(input, 5)
-    }
+    override fun solvePartOne(input: String) = puzzle(input, 5).toString()
 
-    override fun solvePartTwo(input: String): String {
-        return puzzle(input, 18)
-    }
+    override fun solvePartTwo(input: String) = puzzle(input, 18).toString()
 
-    private fun puzzle(input: String, i: Int): String {
-        val (map2, map3) = parseRewriteRules(input)
-        val fullMap2 = expandSymmetries(map2)
-        val fullMap3 = expandSymmetries(map3)
+    private fun puzzle(input: String, i: Int): Int {
+        val rules = parseRewriteRules(input)
+        val fullRules = expandSymmetries(rules)
 
-        var configuration = ".#./..#/###"
-        repeat(i) {
-            configuration = step(configuration, fullMap2, fullMap3)
-        }
+        var grid = startingConfiguration
+        repeat(i) { grid = step(grid, fullRules) }
 
-        return configuration.count { it == '#' }.toString()
-    }
-
-    private fun step(configuration: String, fullMap2: Map<String, String>, fullMap3: Map<String, String>): String {
-        val lengthIsEven = configuration.substringBefore("/").length % 2 == 0
-        return if (lengthIsEven) {
-            evenIteration(configuration, fullMap2)
-        } else {
-            oddIteration(configuration, fullMap3)
+        return grid.sumBy { line ->
+            line.count { char ->
+                char == '#'
+            }
         }
     }
 }
 
-private fun parseRewriteRules(input: String): Pair<Map<String, String>, Map<String, String>> {
-    val (rule2, rule3) = input.split("\n")
-            .map { it.split(" => ") }
-            .map { (k, v) -> k to v }
-            .partition { it.first.length == 5 }
 
-    return Pair(rule2.toMap(), rule3.toMap())
-}
-
-private fun expandSymmetries(input: Map<String, String>): Map<String, String> = input.toMutableMap().apply {
-    input.forEach { (k, v) ->
-        this[rotate(k)] = v
-        this[rotate(rotate(k))] = v
-        this[rotate(rotate(rotate(k)))] = v
-        this[flip(k)] = v
-        this[flip(rotate(k))] = v
-        this[flip(rotate(rotate(k)))] = v
-        this[flip(rotate(rotate(rotate(k))))] = v
-    }
-}
-
-private fun flip(input: String) = input.split('/').joinToString("/") { it.reversed() }
-
-private fun rotate(input: String) = buildString {
-    val grid = input.split('/')
-    for (i in grid.indices) {
-        for (j in grid[0].indices.reversed()) {
-            this.append(grid[j][i])
+private fun parseRewriteRules(input: String): Map<Square, Square> = input.split("\n")
+        .map { it.split(" => ") }
+        .associate { (k, v) ->
+            k.split("/") to v.split("/")
         }
-        if (i != grid.lastIndex) this.append('/')
+
+private fun expandSymmetries(input: Map<Square, Square>): Map<Square, Square> = input
+        .flatMap { entry -> symmetries(entry.key).map { it to entry.value } }
+        .toMap()
+
+private fun symmetries(pattern: Square): List<Square> {
+    val rotations = generateSequence(pattern, ::rotate).take(4).asIterable()
+    return rotations + rotations.map { it.reversed() }
+}
+
+private fun rotate(list: Square): Square {
+    return list.indices.map { i ->
+        list[0].indices.reversed().map { j ->
+            list[j][i]
+        }.joinToString("")
     }
 }
 
-private fun evenIteration(configuration: String, map2: Map<String, String>): String {
 
-    val chunks: List<String> = configuration
-            .split("/")
-            .chunked(2)
-            .flatMap { (a, b) ->
-                a.chunked(2)
-                        .zip(b.chunked(2))
-                        .map { (a, b) -> "$a/$b" }
-            }
-
-
-    val rowLength = sqrt(chunks.size.toDouble()).toInt()
-
-    val new = chunks
-            .map { map2[it]!!.split('/') }
-            .chunked(rowLength)
-            .map { row ->
-                val line0 = row.joinToString("") { chunk -> chunk[0] }
-                val line1 = row.joinToString("") { chunk -> chunk[1] }
-                val line2 = row.joinToString("") { chunk -> chunk[2] }
-                "$line0/$line1/$line2"
-            }
-
-    return new.joinToString("/")
+private fun step(grid: Square, fullRules: Map<Square, Square>): Square {
+    val squareSize = if (grid[0].length % 2 == 0) 2 else 3
+    val squares = splitToSquares(grid, squareSize)
+    val enhancedSquares = replaceSquares(squares, fullRules)
+    return combineSquaresToGrid(enhancedSquares)
 }
 
-private fun oddIteration(configuration: String, map3: Map<String, String>): String {
-    val chunks = configuration
-            .split("/")
-            .chunked(3)
-            .flatMap { (a, b, c) ->
-                a.chunked(3)
-                        .zip(b.chunked(3))
-                        .zip(c.chunked(3))
-                        .map { (a, b) -> "${a.first}/${a.second}/$b" }
+private fun splitToSquares(grid: Square, size: Int): List<List<Square>> =
+        grid.chunked(size) { chunkRow ->
+            chunkRow.map { line -> line.chunked(size) }
+                    .transpose()
+        }
+
+private fun replaceSquares(chunkedGrid: List<List<Square>>, rules: Map<Square, Square>) =
+        chunkedGrid.map { row ->
+            row.map { square ->
+                rules[square]!!
             }
+        }
 
-    val rowLength = sqrt(chunks.size.toDouble()).toInt()
+private fun combineSquaresToGrid(chunkedGrid: List<List<Square>>): Square =
+        chunkedGrid.flatMap { chunkRow ->
+            chunkRow.transpose().map { it.joinToString("") }
+        }
 
-    val new = chunks
-            .map { map3[it]!!.split('/') }
-            .chunked(rowLength)
-            .map { row ->
-                val line0 = row.joinToString("") { chunk -> chunk[0] }
-                val line1 = row.joinToString("") { chunk -> chunk[1] }
-                val line2 = row.joinToString("") { chunk -> chunk[2] }
-                val line3 = row.joinToString("") { chunk -> chunk[3] }
+private inline fun <reified T> List<List<T>>.transpose() =
+        this[0].indices.map { col ->
+            map { it[col] }
+        }
 
-                "$line0/$line1/$line2/$line3"
-            }
 
-    return new.joinToString("/")
-}
+typealias Square = List<String>
