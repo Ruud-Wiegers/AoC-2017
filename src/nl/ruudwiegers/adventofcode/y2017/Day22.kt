@@ -1,26 +1,28 @@
 package nl.ruudwiegers.adventofcode.y2017
 
 import nl.ruudwiegers.adventofcode.AdventSolution
+import nl.ruudwiegers.adventofcode.y2017.Day22.Health.*
+import kotlin.system.measureTimeMillis
 
 object Day22 : AdventSolution(2017, 22) {
 
     override fun solvePartOne(input: String): String {
         val centeredMap = parseInput(input)
-
         var position = Point(0, 0)
-        var direction = directions[0]
+        var direction = Direction.UP
         var infectionsCount = 0
 
         repeat(10000) {
-            if (centeredMap[position] == '#') {
-                direction = direction.turn(1)
-                centeredMap[position] = '.'
+            val health = centeredMap[position] ?: HEALTHY
+            if (health == INFECTED) {
+                direction = direction.right()
+                centeredMap[position] = HEALTHY
             } else {
-                direction = direction.turn(-1)
-                centeredMap[position] = '#'
+                direction = direction.left()
+                centeredMap[position] = INFECTED
                 infectionsCount++
             }
-            position += direction
+            position += direction.vector
         }
         return infectionsCount.toString()
     }
@@ -28,46 +30,55 @@ object Day22 : AdventSolution(2017, 22) {
     override fun solvePartTwo(input: String): String {
         val centeredMap = parseInput(input)
 
-
-        var direction = Point(0, -1)
+        var direction = Direction.UP
         var position = Point(0, 0)
-        var infected = 0
+        var infectionsCount = 0
 
         repeat(10_000_000) {
-            direction = when (centeredMap[position]) {
-                '.', null -> direction.turn(-1)
-                'W' -> direction
-                '#' -> direction.turn(1)
-                'F' -> direction.turn(2)
-                else -> throw IllegalStateException()
+            val health = centeredMap[position] ?: HEALTHY
+            direction = when (health) {
+                HEALTHY -> direction.left()
+                WEAKENED -> direction
+                INFECTED -> direction.right()
+                FLAGGED -> direction.reverse()
             }
-            centeredMap[position] = when (centeredMap[position]) {
-                '.', null -> 'W'
-                'W' -> '#'
-                '#' -> 'F'
-                'F' -> '.'
-                else -> throw IllegalStateException()
-            }
-            if (centeredMap[position] == '#') infected++
-            position += direction
+            if (health == WEAKENED) infectionsCount++
+
+            centeredMap[position] = health.next()
+            position += direction.vector
         }
-        return infected.toString()
+        return infectionsCount.toString()
     }
 
-    private fun parseInput(input: String): MutableMap<Point, Char> {
+    private fun parseInput(input: String): MutableMap<Point, Health> {
         return input.split("\n")
                 .mapIndexed { y, row ->
                     row.mapIndexed { x, char ->
-                        Point(x - row.length / 2, y - row.length / 2) to char
+                        val position = Point(x - row.length / 2, y - row.length / 2)
+                        val state = if (char == '#') INFECTED else HEALTHY
+                        position to state
                     }
                 }
                 .flatten().toMap().toMutableMap()
     }
 
-    private val directions = listOf(Point(0, -1), Point(1, 0), Point(0, 1), Point(-1, 0))
+    private enum class Health {
+        HEALTHY, WEAKENED, INFECTED, FLAGGED;
+
+        fun next() = values().let { it[(it.indexOf(this) + 1) % it.size] }
+    }
+
+    private enum class Direction(val vector: Point) {
+        UP(Point(0, -1)), RIGHT(Point(1, 0)), DOWN(Point(0, 1)), LEFT(Point(-1, 0));
+
+        fun left() = turn(3)
+        fun right() = turn(1)
+        fun reverse() = turn(2)
+
+        private fun turn(i: Int): Direction = Direction.values().let { it[(it.indexOf(this) + i) % it.size] }
+    }
 
     private data class Point(val x: Int, val y: Int) {
         operator fun plus(o: Point) = Point(x + o.x, y + o.y)
-        fun turn(i: Int) = directions[(directions.size + directions.indexOf(this) + i) % directions.size]
     }
 }
