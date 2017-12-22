@@ -2,65 +2,67 @@ package nl.ruudwiegers.adventofcode.y2017
 
 import nl.ruudwiegers.adventofcode.AdventSolution
 import nl.ruudwiegers.adventofcode.y2017.Day22.Health.*
-import kotlin.system.measureTimeMillis
 
 object Day22 : AdventSolution(2017, 22) {
 
     override fun solvePartOne(input: String): String {
-        val centeredMap = parseInput(input)
-        var position = Point(0, 0)
-        var direction = Direction.UP
-        var infectionsCount = 0
+        val map: MutableMap<Point, Health> = parseInput(input)
 
-        repeat(10000) {
-            val health = centeredMap[position] ?: HEALTHY
-            if (health == INFECTED) {
-                direction = direction.right()
-                centeredMap[position] = HEALTHY
-            } else {
-                direction = direction.left()
-                centeredMap[position] = INFECTED
-                infectionsCount++
-            }
-            position += direction.vector
+        val weakWorm = object : Worm() {
+            override fun action(health: Health): Pair<Health, Direction> =
+                    when (health) {
+                        INFECTED -> Pair(HEALTHY, direction.right())
+                        else -> Pair(INFECTED, direction.left())
+                    }
         }
-        return infectionsCount.toString()
+
+        repeat(10000) { weakWorm.burst(map) }
+        return weakWorm.infectionsCount.toString()
     }
 
     override fun solvePartTwo(input: String): String {
-        val centeredMap = parseInput(input)
+        val map: MutableMap<Point, Health> = parseInput(input)
 
-        var direction = Direction.UP
-        var position = Point(0, 0)
+        val strongWorm = object : Worm() {
+            override fun action(health: Health): Pair<Health, Direction> =
+                    Pair(health.next(), when (health) {
+                        HEALTHY -> direction.left()
+                        WEAKENED -> direction
+                        INFECTED -> direction.right()
+                        FLAGGED -> direction.reverse()
+                    })
+        }
+
+        repeat(10_000_000) { strongWorm.burst(map) }
+        return strongWorm.infectionsCount.toString()
+    }
+
+    private abstract class Worm {
+        private var position = Point(0, 0)
+        protected var direction = Direction.UP
         var infectionsCount = 0
 
-        repeat(10_000_000) {
-            val health = centeredMap[position] ?: HEALTHY
-            direction = when (health) {
-                HEALTHY -> direction.left()
-                WEAKENED -> direction
-                INFECTED -> direction.right()
-                FLAGGED -> direction.reverse()
-            }
-            if (health == WEAKENED) infectionsCount++
+        fun burst(map: MutableMap<Point, Health>) {
+            val (newHealth, newDirection) = action(map[position] ?: HEALTHY)
 
-            centeredMap[position] = health.next()
+            map[position] = newHealth
+            direction = newDirection
             position += direction.vector
+            if (newHealth == INFECTED) infectionsCount++
         }
-        return infectionsCount.toString()
+
+        protected abstract fun action(health: Health): Pair<Health, Direction>
     }
 
-    private fun parseInput(input: String): MutableMap<Point, Health> {
-        return input.split("\n")
-                .mapIndexed { y, row ->
-                    row.mapIndexed { x, char ->
-                        val position = Point(x - row.length / 2, y - row.length / 2)
-                        val state = if (char == '#') INFECTED else HEALTHY
-                        position to state
-                    }
+    private fun parseInput(input: String): MutableMap<Point, Health> = input.split("\n")
+            .mapIndexed { y, row ->
+                row.mapIndexed { x, char ->
+                    val position = Point(x - row.length / 2, y - row.length / 2)
+                    val state = if (char == '#') INFECTED else HEALTHY
+                    position to state
                 }
-                .flatten().toMap().toMutableMap()
-    }
+            }
+            .flatten().toMap().toMutableMap()
 
     private enum class Health {
         HEALTHY, WEAKENED, INFECTED, FLAGGED;
