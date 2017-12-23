@@ -2,7 +2,7 @@ package nl.ruudwiegers.adventofcode.y2017
 
 import nl.ruudwiegers.adventofcode.AdventSolution
 
-object Day08 : AdventSolution(2017, 8) {
+object Day08 : AdventSolution(2017, 8, "I Heard You Like Registers") {
 
     override fun solvePartOne(input: String): String {
         val registers = mutableMapOf<String, Int>()

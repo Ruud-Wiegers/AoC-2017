@@ -4,7 +4,7 @@ import nl.ruudwiegers.adventofcode.AdventSolution
 
 private val startingConfiguration: Square = ".#./..#/###".split('/')
 
-object Day21 : AdventSolution(2017, 21) {
+object Day21 : AdventSolution(2017, 21, "Fractal Art") {
 
     override fun solvePartOne(input: String) = puzzle(input, 5).toString()
 

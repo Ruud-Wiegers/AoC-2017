@@ -3,7 +3,7 @@ package nl.ruudwiegers.adventofcode.y2017
 import nl.ruudwiegers.adventofcode.AdventSolution
 import kotlin.math.abs
 
-object Day11 : AdventSolution(2017, 11) {
+object Day11 : AdventSolution(2017, 11,"Hex Ed") {
     override fun solvePartOne(input: String) = input.split(",")
             .mapNotNull { coordinatesForDirection[it] }
             .reduce { a, b -> a + b }

@@ -2,7 +2,7 @@ package nl.ruudwiegers.adventofcode.y2017
 
 import nl.ruudwiegers.adventofcode.AdventSolution
 
-object Day02 : AdventSolution(2017, 2) {
+object Day02 : AdventSolution(2017, 2,"Corruption Checksum") {
 
     override fun solvePartOne(input: String) = solveForChecksum(input) { it.max()!! - it.min()!! }
 

@@ -2,7 +2,7 @@ package nl.ruudwiegers.adventofcode.y2017
 
 import nl.ruudwiegers.adventofcode.AdventSolution
 
-object Day05 : AdventSolution(2017, 5) {
+object Day05 : AdventSolution(2017, 5,"A Maze of Twisty Trampolines, All Alike") {
 
     override fun solvePartOne(input: String): String {
         val jumpmap = parse(input)

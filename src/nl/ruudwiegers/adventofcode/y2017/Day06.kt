@@ -2,7 +2,7 @@ package nl.ruudwiegers.adventofcode.y2017
 
 import nl.ruudwiegers.adventofcode.AdventSolution
 
-object Day06 : AdventSolution(2017, 6) {
+object Day06 : AdventSolution(2017, 6,"Memory Reallocation") {
 
     override fun solvePartOne(input: String): String {
         val state = parse(input)

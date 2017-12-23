@@ -2,7 +2,7 @@ package nl.ruudwiegers.adventofcode.y2017
 
 import nl.ruudwiegers.adventofcode.AdventSolution
 
-object Day14 : AdventSolution(2017, 14) {
+object Day14 : AdventSolution(2017, 14, "Disk Defragmentation") {
 
     override fun solvePartOne(input: String): String = (0..127)
             .map { "$input-$it" }

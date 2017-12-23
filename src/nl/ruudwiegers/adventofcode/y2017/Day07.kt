@@ -2,7 +2,7 @@ package nl.ruudwiegers.adventofcode.y2017
 
 import nl.ruudwiegers.adventofcode.AdventSolution
 
-object Day07 : AdventSolution(2017, 7) {
+object Day07 : AdventSolution(2017, 7,"Recursive Circus") {
 
     override fun solvePartOne(input: String): String {
         return findRootProgram(parse(input)).name

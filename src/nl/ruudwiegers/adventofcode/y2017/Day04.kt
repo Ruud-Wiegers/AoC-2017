@@ -2,7 +2,7 @@ package nl.ruudwiegers.adventofcode.y2017
 
 import nl.ruudwiegers.adventofcode.AdventSolution
 
-object Day04 : AdventSolution(2017, 4) {
+object Day04 : AdventSolution(2017, 4,"High-Entropy Passphrases") {
 
     override fun solvePartOne(input: String) = input
             .split("\n")

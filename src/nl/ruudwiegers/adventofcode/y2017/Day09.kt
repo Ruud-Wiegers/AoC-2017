@@ -2,7 +2,7 @@ package nl.ruudwiegers.adventofcode.y2017
 
 import nl.ruudwiegers.adventofcode.AdventSolution
 
-object Day09 : AdventSolution(2017, 9) {
+object Day09 : AdventSolution(2017, 9,"Stream Processing") {
 
     override fun solvePartOne(input: String): String {
         val cleanedInput = input

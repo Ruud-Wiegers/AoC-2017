@@ -9,7 +9,7 @@ fun main(args: Array<String>) {
     Day03.solve()
 }
 
-object Day03 : AdventSolution(2017, 3) {
+object Day03 : AdventSolution(2017, 3,"Spiral Memory") {
 
     override fun solvePartOne(input: String): String {
         val (x, y) = toSpiralCoordinates(input.toInt())

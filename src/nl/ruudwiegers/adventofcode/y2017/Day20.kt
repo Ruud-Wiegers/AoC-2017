@@ -3,7 +3,7 @@ package nl.ruudwiegers.adventofcode.y2017
 import nl.ruudwiegers.adventofcode.AdventSolution
 import kotlin.math.abs
 
-object Day20 : AdventSolution(2017, 20) {
+object Day20 : AdventSolution(2017, 20, "Particle Swarm") {
 
     //this comparator is not correct, but works for my input :S
     override fun solvePartOne(input: String): String {

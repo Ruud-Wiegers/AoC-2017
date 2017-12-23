@@ -2,10 +2,12 @@ package nl.ruudwiegers.adventofcode.y2017
 
 import nl.ruudwiegers.adventofcode.AdventSolution
 
-object Day16 : AdventSolution(2017, 16) {
+object Day16 : AdventSolution(2017, 16, "Permutation Promenade") {
 
     override fun solvePartOne(input: String): String = dance(parseInput(input), "abcdefghijklmnop")
 
+
+    //There's actually a small upper bound for the loop size! Landau's Function
     override fun solvePartTwo(input: String): String {
         val danceMoves: List<Action> = parseInput(input)
         val orderings = applyUntilFirstRepetition("abcdefghijklmnop") { dance(danceMoves, it) }

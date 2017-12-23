@@ -2,7 +2,7 @@ package nl.ruudwiegers.adventofcode.y2017
 
 import nl.ruudwiegers.adventofcode.AdventSolution
 
-object Day12 : AdventSolution(2017, 12) {
+object Day12 : AdventSolution(2017, 12, "Digital Plumber") {
 
     override fun solvePartOne(input: String): String {
         val connections = parseInput(input)

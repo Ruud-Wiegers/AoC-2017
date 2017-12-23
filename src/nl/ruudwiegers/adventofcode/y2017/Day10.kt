@@ -2,7 +2,7 @@ package nl.ruudwiegers.adventofcode.y2017
 
 import nl.ruudwiegers.adventofcode.AdventSolution
 
-object Day10 : AdventSolution(2017, 10) {
+object Day10 : AdventSolution(2017, 10, "Knot Hash") {
 
     override fun solvePartOne(input: String): String {
         val lengths = input.split(",").map { it.toInt() }

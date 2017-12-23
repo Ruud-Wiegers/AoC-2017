@@ -2,7 +2,7 @@ package nl.ruudwiegers.adventofcode.y2017
 
 import nl.ruudwiegers.adventofcode.AdventSolution
 
-object Day19 : AdventSolution(2017, 19) {
+object Day19 : AdventSolution(2017, 19, "A Series of Tubes") {
 
     override fun solvePartOne(input: String): String {
         val lines = input.split("\n")

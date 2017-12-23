@@ -2,7 +2,7 @@ package nl.ruudwiegers.adventofcode.y2017
 
 import nl.ruudwiegers.adventofcode.AdventSolution
 
-object Day01 : AdventSolution(2017, 1) {
+object Day01 : AdventSolution(2017, 1,"Inverse Captcha") {
 
     override fun solvePartOne(input: String): String {
         val pairs = (input + input[0]).zipWithNext()

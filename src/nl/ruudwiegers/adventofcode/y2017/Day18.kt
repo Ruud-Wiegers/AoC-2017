@@ -2,7 +2,7 @@ package nl.ruudwiegers.adventofcode.y2017
 
 import nl.ruudwiegers.adventofcode.AdventSolution
 
-object Day18 : AdventSolution(2017, 18) {
+object Day18 : AdventSolution(2017, 18,"Duet") {
 
     override fun solvePartOne(input: String): String {
         val instructions = parseInstructions(input)

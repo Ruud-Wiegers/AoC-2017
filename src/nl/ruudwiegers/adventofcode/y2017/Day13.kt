@@ -2,7 +2,7 @@ package nl.ruudwiegers.adventofcode.y2017
 
 import nl.ruudwiegers.adventofcode.AdventSolution
 
-object Day13 : AdventSolution(2017, 13) {
+object Day13 : AdventSolution(2017, 13,"Packet Scanners") {
 
     override fun solvePartOne(input: String): String = parseInput(input)
             .filter { (depth, range) -> depth % (range * 2 - 2) == 0 }

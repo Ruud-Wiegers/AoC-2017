@@ -3,7 +3,7 @@ package nl.ruudwiegers.adventofcode.y2017
 import nl.ruudwiegers.adventofcode.AdventSolution
 import nl.ruudwiegers.adventofcode.y2017.Day22.Health.*
 
-object Day22 : AdventSolution(2017, 22) {
+object Day22 : AdventSolution(2017, 22, "Sporifica Virus") {
 
     override fun solvePartOne(input: String): String {
         val map: MutableMap<Point, Health> = parseInput(input)

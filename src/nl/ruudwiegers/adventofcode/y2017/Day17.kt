@@ -2,7 +2,7 @@ package nl.ruudwiegers.adventofcode.y2017
 
 import nl.ruudwiegers.adventofcode.AdventSolution
 
-object Day17 : AdventSolution(2017, 17) {
+object Day17 : AdventSolution(2017, 17,"Spinlock") {
 
     override fun solvePartOne(input: String): String {
         val step = input.toInt()
