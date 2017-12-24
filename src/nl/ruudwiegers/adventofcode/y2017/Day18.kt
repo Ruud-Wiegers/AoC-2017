@@ -84,7 +84,7 @@ private class ProgramTwo(id: Long,
     }
 }
 
-private class ExecutionContext {
+class ExecutionContext {
     private val registers: MutableMap<String, Long> = mutableMapOf()
 
     operator fun get(value: String) = value.toLongOrNull() ?: registers[value] ?: 0
