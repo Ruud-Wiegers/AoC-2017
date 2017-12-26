@@ -1,27 +1,17 @@
 package nl.ruudwiegers.adventofcode.y2017
 
 import nl.ruudwiegers.adventofcode.AdventSolution
-import nl.ruudwiegers.adventofcode.y2017.TuringState.*
-
-fun main(args: Array<String>) {
-    print(Day25.solvePartOne(""))
-}
 
 object Day25 : AdventSolution(2017, 25, "The Halting Problem") {
 
     override fun solvePartOne(input: String): String {
+        val (stepsUntilDiagnostic, turingMachine) = parseInstructions(input)
 
-        val tape = mutableMapOf<Int, Boolean>()
-        var position = 0
-        var state: TuringState = A
-        repeat(12861455) {
-            val transition = if (tape[position] == true) transitionsOne[state]!! else transitionsZero[state]!!
-            tape[position] = transition.writeOne
-            if (transition.toRight) position++ else position--
-            state = transition.nextState
+        repeat(stepsUntilDiagnostic) {
+            turingMachine.step()
         }
 
-        return tape.values.count { it }.toString()
+        return turingMachine.tape.values.count { it == "1" }.toString()
     }
 
     override fun solvePartTwo(input: String): String {
@@ -30,29 +20,53 @@ object Day25 : AdventSolution(2017, 25, "The Halting Problem") {
 
 }
 
+private fun parseInstructions(input: String): Pair<Int, TuringMachine> {
+    val instructions = input.split("\n")
+    val initialState = instructions[0].substringAfter("Begin in state ")
+            .dropLast(1)
+    val stepsUntilDiagnostic = instructions[1].substringAfter("Perform a diagnostic checksum after ")
+            .substringBefore(" steps.").toInt()
 
-enum class TuringState {
-    A, B, C, D, E, F
+    val transitionRules = (3 until instructions.size step 10)
+            .flatMap { lineNumber ->
+                readStateTransistions(instructions, lineNumber)
+            }
+            .associateBy { Pair(it.state, it.read) }
+
+    val turingMachine = TuringMachine(initialState, transitionRules)
+    return Pair(stepsUntilDiagnostic, turingMachine)
+}
+private fun readStateTransistions(instructions: List<String>, lineNumber: Int): List<Transition> {
+    val state = instructions[lineNumber].substringAfter("In state ")
+            .dropLast(1)
+
+    val t1 = readTransition(state, instructions, lineNumber + 1)
+    val t2 = readTransition(state, instructions, lineNumber + 5)
+    return listOf(t1, t2)
 }
 
-class Transition(val writeOne: Boolean, val toRight: Boolean, val nextState: TuringState)
-val transitionsZero = mapOf(
-        A to Transition(true, true, B),
-        B to Transition(true, false, C),
-        C to Transition(true, true, E),
-        D to Transition(true, false, A),
-        E to Transition(false, true, A),
-        F to Transition(true, true, E)
-)
+private fun readTransition(state: String, instructions: List<String>, lineNumber: Int): Transition {
+    val read = instructions[lineNumber].substringAfter("If the current value is ").dropLast(1)
+    val write = instructions[lineNumber + 1].substringAfter("- Write the value ").dropLast(1)
+    val moveDirection = instructions[lineNumber + 2].substringAfter("- Move one slot to the ").dropLast(1)
+    val nextState = instructions[lineNumber + 3].substringAfter("- Continue with state ").dropLast(1)
 
-val transitionsOne = mapOf(
-        A to Transition(false, false, B),
-        B to Transition(false, true, E),
-        C to Transition(false, false, D),
-        D to Transition(true, false, A),
-        E to Transition(false, true, F),
-        F to Transition(true, true, A)
-)
+    val move: Int = if (moveDirection == "right") 1 else -1
+    return Transition(state, read, write, move, nextState)
+}
 
 
+private data class TuringMachine(var state: String, val transitionRules: Map<Pair<String, String>, Transition>) {
+    val tape = mutableMapOf<Int, String>()
+    var position = 0
 
+    fun step() {
+        val read = tape[position] ?: "0"
+        val rule = transitionRules[Pair(state, read)]!!
+        tape[position] = rule.write
+        position += rule.move
+        state = rule.nextState
+    }
+}
+
+private data class Transition(val state: String, val read: String, val write: String, val move: Int, val nextState: String)

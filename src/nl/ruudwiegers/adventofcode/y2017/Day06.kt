@@ -2,24 +2,20 @@ package nl.ruudwiegers.adventofcode.y2017
 
 import nl.ruudwiegers.adventofcode.AdventSolution
 
-object Day06 : AdventSolution(2017, 6,"Memory Reallocation") {
+object Day06 : AdventSolution(2017, 6, "Memory Reallocation") {
 
     override fun solvePartOne(input: String): String {
         val state = parse(input)
-        val history = mutableSetOf<List<Int>>()
         return generateSequence(state) { redistribute(it) }
-                .takeWhile { it !in history }
-                .onEach { history += it }
+                .takeWhileDistinct()
                 .count()
                 .toString()
     }
 
     override fun solvePartTwo(input: String): String {
         val state = parse(input)
-        val history = mutableSetOf<List<Int>>()
         val seen = generateSequence(state) { redistribute(it) }
-                .takeWhile { it !in history }
-                .onEach { history += it }
+                .takeWhileDistinct()
                 .last()
 
         val s = generateSequence(seen) { redistribute(it) }
@@ -44,4 +40,10 @@ object Day06 : AdventSolution(2017, 6,"Memory Reallocation") {
     private fun parse(input: String) = input
             .split("\t")
             .map { it.toInt() }
+}
+
+fun <T> Sequence<T>.takeWhileDistinct(): Sequence<T> {
+    val history = mutableSetOf<T>()
+    return takeWhile { it !in history }
+            .onEach { history += it }
 }

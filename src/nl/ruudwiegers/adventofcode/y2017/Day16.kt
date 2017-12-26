@@ -10,10 +10,11 @@ object Day16 : AdventSolution(2017, 16, "Permutation Promenade") {
     //There's actually a small upper bound for the loop size! Landau's Function
     override fun solvePartTwo(input: String): String {
         val danceMoves: List<Action> = parseInput(input)
-        val orderings = applyUntilFirstRepetition("abcdefghijklmnop") { dance(danceMoves, it) }
-        val startOfLoop = orderings.indexOf(orderings.last())
-        val loopSize = orderings.size - startOfLoop - 1
-        val remainder = (1_000_000_000 - startOfLoop) % loopSize
+        val orderings = generateSequence("abcdefghijklmnop") { dance(danceMoves, it) }
+                .takeWhileDistinct()
+                .toList()
+
+        val remainder = (1_000_000_000 % orderings.size)
 
         return orderings[remainder]
     }
@@ -28,21 +29,8 @@ object Day16 : AdventSolution(2017, 16, "Permutation Promenade") {
                 }
             }
 
-
-    /* repeatedly apply the operation, until an existing result is found
-    Returns the list of intermediate values, including the final repeated value
-    The distinct-check is pretty slow, but faster versions are less legible
-    */
-    private inline fun <T> applyUntilFirstRepetition(initial: T, operation: (T) -> T): List<T> {
-        val accumulator = mutableListOf(initial)
-        do {
-            val newOrdering = operation(accumulator.last())
-            accumulator += newOrdering
-        } while (accumulator.indexOf(newOrdering) == accumulator.lastIndex)
-        return accumulator
-    }
-
-    private fun dance(moves: List<Action>, initialPositions: String) = moves.fold(initialPositions) { acc, action -> action.execute(acc) }
+    private fun dance(moves: List<Action>, initialPositions: String) =
+            moves.fold(initialPositions) { acc, action -> action.execute(acc) }
 }
 
 private sealed class Action {

@@ -2,17 +2,19 @@ package nl.ruudwiegers.adventofcode.y2017
 
 import nl.ruudwiegers.adventofcode.AdventSolution
 
-object Day05 : AdventSolution(2017, 5,"A Maze of Twisty Trampolines, All Alike") {
+object Day05 : AdventSolution(2017, 5, "A Maze of Twisty Trampolines, All Alike") {
 
     override fun solvePartOne(input: String): String {
         val jumpmap = parse(input)
-        return countJumps(jumpmap) { it + 1 }
+        val modification: (Int) -> Int = { it + 1 }
+        return countJumps(jumpmap, modification)
                 .toString()
     }
 
     override fun solvePartTwo(input: String): String {
         val jumpmap = parse(input)
-        return countJumps(jumpmap) { if (it < 3) it + 1 else it - 1 }
+        val modification: (Int) -> Int = { if (it < 3) it + 1 else it - 1 }
+        return countJumps(jumpmap, modification)
                 .toString()
     }
 
@@ -23,16 +25,15 @@ object Day05 : AdventSolution(2017, 5,"A Maze of Twisty Trampolines, All Alike")
 
 
     private inline fun countJumps(jumpmap: IntArray, modification: (Int) -> Int): Int {
-        var count = 0
-        var pos = 0
+        var jumpCount = 0
+        var currentPosition = 0
 
-        while (pos in jumpmap.indices) {
-
-            val oldPos = pos
-            pos += jumpmap[pos]
-            jumpmap[oldPos] = modification(jumpmap[oldPos])
-            count++
+        while (currentPosition in jumpmap.indices) {
+            val jumpSize = jumpmap[currentPosition]
+            jumpmap[currentPosition] = modification(jumpSize)
+            currentPosition += jumpSize
+            jumpCount++
         }
-        return count
+        return jumpCount
     }
 }

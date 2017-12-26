@@ -2,22 +2,24 @@ package nl.ruudwiegers.adventofcode.y2017
 
 import nl.ruudwiegers.adventofcode.AdventSolution
 
-object Day15 : AdventSolution(2017, 15,"Dueling Generators") {
+object Day15 : AdventSolution(2017, 15, "Dueling Generators") {
 
     override fun solvePartOne(input: String): String {
-        val generatorSeeds: List<Long> = parseInput(input)
+        val (seedA, seedB) = parseInput(input)
 
-        val genA = generateSequence(generatorSeeds[0]) { it * 16807L % 2147483647L }
-        val genB = generateSequence(generatorSeeds[1]) { it * 48271L % 2147483647L }
+        val genA = generateSequence(seedA) { it * 16807L % 2147483647L }
+        val genB = generateSequence(seedB) { it * 48271L % 2147483647L }
 
         return judge(genA, genB, 40_000_000).toString()
     }
 
     override fun solvePartTwo(input: String): String {
-        val generatorSeeds = parseInput(input)
+        val (seedA, seedB) = parseInput(input)
 
-        val genA = generateSequence(generatorSeeds[0]) { it * 16807L % 2147483647L }.filter { it % 4L == 0L }
-        val genB = generateSequence(generatorSeeds[1]) { it * 48271L % 2147483647L }.filter { it % 8L == 0L }
+        val genA = generateSequence(seedA) { it * 16807L % 2147483647L }
+                .filter { it % 4L == 0L }
+        val genB = generateSequence(seedB) { it * 48271L % 2147483647L }
+                .filter { it % 8L == 0L }
 
         return judge(genA, genB, 5_000_000).toString()
     }
