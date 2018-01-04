@@ -1,9 +1,7 @@
 # AoC-2017
 Solutions for [Advent of Code 2017](http://adventofcode.com/), written in [Kotlin](https://kotlinlang.org/).
 
-With a few exceptions, the solutions are written as self-contained files. The coding style is firmly 'recreational'. More attention has been paid to 'Can I write this without variables?' than 'Will I understand this code in a month's time?'
-
-It's been great fun, though, and I'm definitely proud of the elegance of *some* of these solutions.
+With a few exceptions, the solutions are written as self-contained files. The coding style is firmly 'recreational'. More attention has been paid to conciseness than to legibility. It's been great fun though, and I'm definitely proud of the elegance of *some* of these solutions.
 
 ## The solutions
  * [Day 1: Inverse Captcha](src/nl/ruudwiegers/adventofcode/y2017/Day01.kt)
